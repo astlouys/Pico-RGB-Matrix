@@ -1,2 +1,3 @@
+# Coming soon...
 # Pico-RGB-Matrix
 Firmware for the Waveshare's Pico RGB Matrix device
