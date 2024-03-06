@@ -64,7 +64,7 @@ Firmware hilights:
 53)	Provide a “Golden Age” option to help senior people having problems in their day-to-day lifes.
 54)	Allows for automatic detection of microcontroller used (Pico or PicoW), along with microcontroller “Unique ID” (“serial number”).
 55)	Add a count-down timer with an alarm (to be completed).
-56)	Add a count-up timer (to be ocmpleted).
+56)	Add a count-up timer (to be completed).
 57)	Write a User Guide to help users getting the most out of this amazing device.
 58)	Many other cleanup and optimizations from the original code by Waveshare.
 
