@@ -12,7 +12,7 @@ Firmware hilights:
 1)	Add support for NTP (“Network Time Protocol”) to periodically resynchronize the RGB Matrix with an Internet time reference source if user installed a PicoW.
 2)	Handling of the RGB Matrix framebuffer ported from 8-bits to 64-bits for easier, faster and optimized support.
 3)	Add horizontal scrolling feature for text on the LED display.
-4)	Provide customizable “auto-scroll” option to scroll information on RGB Matrix at adjustable time intervals. Information to be scrolled can be selected by user among a predefined choice (see details the User Guide). Five (5) independant auto-scrolls are available.
+4)	Provide customizable “auto-scroll” option to scroll information on RGB Matrix at adjustable time intervals. Information to be scrolled can be selected by user among a predefined choice (see details the User Guide). Five (5) independent auto-scrolls are available.
 5)	Rename many variables and function names so that they are more representative.
 6)	Keep only the Raspberry Pi Pico (or PicoW) source code (discard EPS32 microcontroller support).
 7)	Discard Chinese language support.
@@ -54,14 +54,14 @@ Firmware hilights:
 43)	Invert the logic of ambient light reading so that a higher value means “more ambient light”, to make it more intuitive.
 44)	Add a compile time option to completely shut Off sound from the device.
 45)	Allow time display in 12-hour or 24-hour format (to be completed).
-46)	Allow automatic support of daylight saving time for most – if not all – countries in the world, along with different timezones (to be completed).
+46)	Allow automatic support of daylight saving time for most – if not all – countries in the world, along with different time zones (to be completed).
 47)	Implement a watchdog mechanism to recover from a Firmware crash for users who want to modify / work on the Firmware.
 48)	Add an indicator on the RGB Matrix showing the watchdog timing status and "how far we are" from an eventual restart.
 49)	LED display provides indicators to show that the main system "forever loop" is up and running (still active).
 50)	Functions have been implemented to support “human time”, “tm time” and "Unix time”, to better support DS3231, Network Time Protocol and other inherent functions.
 51)	Optionally scroll the cumulative device “Up time” since last power-up.
 52)	Provide a specific indicator on the RGB Matrix to let the user know if there is a problem with Wi-Fi and / or NTP support.
-53)	Provide a “Golden Age” option to help senior people having problems in their day-to-day lifes.
+53)	Provide a “Golden Age” option to help senior people having problems in their day-to-day lives.
 54)	Allows for automatic detection of microcontroller used (Pico or PicoW), along with microcontroller “Unique ID” (“serial number”).
 55)	Add a count-down timer with an alarm (to be completed).
 56)	Add a count-up timer (to be completed).
