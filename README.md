@@ -1,6 +1,6 @@
 ![image](https://github.com/astlouys/Pico-RGB-Matrix/assets/102733655/7ccc4ed1-cc92-4a48-820c-ed7c5804f344)
 
-# Coming soon...
+# I need your feedback... see "Discussions" section in this repository
 # Firmware for the Waveshare's Pico-RGB-Matrix device
 
 PLEASE NOTE: This is a work-in-progress. I encourage you to report bugs, but be aware that there is no "quality-control team" behind the code development. So, be indulgent...
