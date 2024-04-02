@@ -1,0 +1,51 @@
+# CMakeLists.txt
+# For PicoW-RGB-Matrix
+# CMakeLists.txt version for PicoW, with NTP support.
+#
+#
+cmake_minimum_required(VERSION 3.16)
+#
+#
+# Pico SDK may be initialized from Git
+## set(PICO_SDK_FETCH_FROM_GIT on)
+#
+# Pico SDK may also be cloned locally without copying <pico_sdk_import.cmake>
+## include(/home/pi/pico/pico-sdk/pico_sdk_init.cmake)
+#
+include(pico_sdk_import.cmake)
+#
+#
+project(PicoW-RGB-Matrix)
+#
+#
+# set (CMAKE_TRY_COMPILE_TARGET_TYPE "STATIC_LIBRARY")
+set (C_STANDARD 11)
+set (CXX_STANDARD 17)
+set (PICO_BOARD pico_w)
+#
+#
+# Initialize the SDK
+pico_sdk_init()
+#
+#
+add_executable(PicoW-RGB-Matrix
+  ./Pico-RGB-Matrix.c
+  ./PicoW-NTP-Client.c)
+#
+#
+target_link_libraries(PicoW-RGB-Matrix pico_stdlib hardware_adc hardware_clocks hardware_flash hardware_i2c hardware_irq hardware_pwm hardware_sync hardware_uart pico_bootrom pico_multicore pico_cyw43_arch_lwip_threadsafe_background)
+#
+#
+target_include_directories(PicoW-RGB-Matrix PRIVATE
+  ${CMAKE_CURRENT_LIST_DIR}
+  ${CMAKE_CURRENT_LIST_DIR}/.. # for our common lwipopts
+  )
+#
+#
+# Enable usb output, disable uart output
+pico_enable_stdio_usb(PicoW-RGB-Matrix  1)
+pico_enable_stdio_uart(PicoW-RGB-Matrix 0)
+#
+#
+# Create map/bin/hex/uf2 files in addition to ELF.
+pico_add_extra_outputs(PicoW-RGB-Matrix)
