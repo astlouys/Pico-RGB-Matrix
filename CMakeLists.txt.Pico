@@ -1,0 +1,40 @@
+# CMakeLists.txt
+# For Pico-RGB-Matrix
+# CMakeLists.txt version for Pico W, with NTP support.
+#
+#
+cmake_minimum_required(VERSION 3.16)
+#
+#
+include(pico_sdk_import.cmake)
+#
+#
+project(Pico-RGB-Matrix)
+#
+#
+# set (CMAKE_TRY_COMPILE_TARGET_TYPE "STATIC_LIBRARY")
+set (C_STANDARD 11)
+set (CXX_STANDARD 17)
+set (PICO_BOARD pico_w)
+#
+#
+pico_sdk_init()
+#
+#
+add_executable(Pico-RGB-Matrix
+  ./Pico-RGB-Matrix.c)
+#
+#
+target_link_libraries(Pico-RGB-Matrix pico_stdlib hardware_adc hardware_clocks hardware_flash hardware_i2c hardware_irq hardware_pwm hardware_sync hardware_uart pico_multicore)
+#
+#
+target_include_directories(Pico-RGB-Matrix PRIVATE)
+#
+#
+# Enable usb output, disable uart output
+pico_enable_stdio_usb(Pico-RGB-Matrix  1)
+pico_enable_stdio_uart(Pico-RGB-Matrix 0)
+#
+#
+# Create map/bin/hex file etc.
+pico_add_extra_outputs(Pico-RGB-Matrix)
