@@ -4,12 +4,16 @@
 # Firmware for the Waveshare's Pico-RGB-Matrix device
 
 NOTES:
+
 a) This is a work-in-progress. I encourage you to report bugs, but be aware that there is no "quality-control team" behind the code development. So, be indulgent...
+
 b) Please take note that I'm not a Waveshare employee. This firmware is provided "as is" to help users develop their own code.
+
 c) The flle "pico_sdk_import.cmake" is not in the repository but is required to build the project. I suggest that your make a symbolic link in your project directory: "ln -s /home/pi/pico/pico-sdk/external/pico_sdk_import.cmake" (assuming that you used the recommended directory names) This way, as soon as you update your SDK, rebuilding your project will automatically use the latest version.
 
 
-Firmware hilights:
+
+# Firmware hilights:
 
 1)	Add support for NTP (“Network Time Protocol”) to periodically resynchronize the RGB Matrix with an Internet time reference source if user installed a PicoW.
 2)	Handling of the RGB Matrix framebuffer ported from 8-bits to 64-bits for easier, faster and optimized support.
