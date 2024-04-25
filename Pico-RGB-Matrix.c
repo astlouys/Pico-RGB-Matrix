@@ -2,9 +2,9 @@
    Pico-RGB-Matrix.c
    St-Louys Andre - August 2022
    astlouys@gmail.com
-   Revision 30-MAR-2024
+   Revision 25-APR-2024
    Langage: C with arm-none-eabi
-   Version 2.00
+   Version 2.01
 
    Raspberry Pi Pico Firmware to drive the Waveshare Pico-RGB-Matrix.
    From an original software version 1.00 by Waveshare
@@ -80,6 +80,9 @@
                     - Implement different "time" functions to easily support NTP, DST, etc. ("human time" "Unix time", "tm time").
                     - Add a "Wi-Fi health indicator" (with the two Time "double-dots" indicator).
                     - Add many "win_xxx()" basic windowing functions to make it easier to build more complex windowing algorithm (win_open(), win_scroll(), win_blink(), etc...)
+   25-APR-2024 2.01 - Adapt NTP algorithm so that connection will resume automatically after a connection lost.
+                    - Apply a quick fix to comply with a critical timing in the new version of the RGB Matrix control board. Thanks to Waveshare for their support with this one !
+                    - Upgrade the bitmap of the 8x10 digits "6" and "9".
 \* ============================================================================================================================================================= */
 
 
@@ -124,7 +127,7 @@ GPIO 30  - - -    (not used).
 
 
 /* Firmware version. */
-#define FIRMWARE_VERSION "2.00"  ///
+#define FIRMWARE_VERSION "2.01"  ///
 
 /* End users should uncomment the line below. If the line below is commented, a <DEVELOPER_VERSION> will be built and may perform
    unusual behavior for debugging and / or development purposes. In this case, you will be on your own to work through the code. */
@@ -1718,7 +1721,7 @@ int main(void)
   NTPData.FlagNTPHistory = FLAG_OFF;  // will be set according to the operations outcome.
   NTPData.NTPRefresh     = NTP_REFRESH;
   NTPData.NTPErrors      = 0l;        // reset number of NTP errors on entry.
-  NTPData.NTPReadCycles  = 0l;        // reset number of NTP read cycles on entry.
+  NTPData.NTPReadCycles  = 0l;
   NTPData.NTPPollCycles  = 0l;        // reset number of NTP poll cycles on entry.
   NTPData.UnixTime       = (time_t)0ll;
   NTPData.NTPUpdateTime  = nil_time;
@@ -1730,9 +1733,8 @@ int main(void)
   /* Initialize Wi-Fi connection. */
   if (ntp_init(FlashConfig1.SSID, FlashConfig1.Password) == false)
   {
-    NTPData.NTPUpdateTime = make_timeout_time_ms(NTPData.NTPRefresh * 1000);
+    NTPData.NTPUpdateTime = make_timeout_time_ms(NTPData.NTPLagTime * 1000);
     uart_send(__LINE__, __func__, "ntp_init(): error while trying to establish Wi-Fi connection.\r");
-    /// uart_send(__LINE__, __func__, "NTPData.NTPUpdateTime (sec):      %12llu\r\r\r",  to_us_since_boot(NTPData.NTPUpdateTime) / 1000000ll);
     if (DebugBitMask & DEBUG_NTP)
     {
       uart_send(__LINE__, __func__, "=========================================================\r");
@@ -1878,7 +1880,7 @@ int main(void)
 
 
     /* --------------------------------------------------------------------------------------------------------------------------- *\
-                      Check if something has been received from local buttons and / or from remote control buttons.
+                                 Check if something has been received from remote control buttons.
     \* --------------------------------------------------------------------------------------------------------------------------- */
 #ifdef REMOTE_SUPPORT
     /* If infrared remote control support is enabled, check if data has been received by infrared sensor. */
@@ -1888,6 +1890,11 @@ int main(void)
     }
 #endif  // REMOTE_SUPPORT
 
+
+
+    /* --------------------------------------------------------------------------------------------------------------------------- *\
+                  Check if something has been received either from local buttons and / or from remote control buttons.
+    \* --------------------------------------------------------------------------------------------------------------------------- */
     if (ButtonBuffer[0] != BUTTON_NONE)
     {
       if (DebugBitMask & DEBUG_BUTTON)
@@ -2002,26 +2009,7 @@ int main(void)
         AbsoluteEntryTime = nil_time;
         AbsoluteExitTime  = nil_time;
       }
-    }
 
-
-
-    /* --------------------------------------------------------------------------------------------------------------------------- *\
-                    2-seconds timestep and schedule mark. Put here functions that we want to execute every 2 seconds.
-    \* --------------------------------------------------------------------------------------------------------------------------- */
-    if ((CurrentTimer - LastTimer2Sec) > 2000000ll)
-    {
-      LastTimer2Sec = CurrentTimer;
-    }
-
-
-
-    /* --------------------------------------------------------------------------------------------------------------------------- *\
-                    5-seconds timestep and schedule mark. Put here functions that we want to execute every 5 seconds.
-    \* --------------------------------------------------------------------------------------------------------------------------- */
-    if ((CurrentTimer - LastTimer5Sec) > 5000000ll)
-    {
-      LastTimer5Sec = CurrentTimer;
 
 
       /* --------------------------------------------------------------------------------------------------------------------------- *\
@@ -2053,7 +2041,26 @@ int main(void)
         /* Reset this function in the bitmask once this cycle is over. */
         AutoScrollBitMask &= ~(0x01 << Loop1UInt16);
       }
+    }
 
+
+
+    /* --------------------------------------------------------------------------------------------------------------------------- *\
+                    2-seconds timestep and schedule mark. Put here functions that we want to execute every 2 seconds.
+    \* --------------------------------------------------------------------------------------------------------------------------- */
+    if ((CurrentTimer - LastTimer2Sec) > 2000000ll)
+    {
+      LastTimer2Sec = CurrentTimer;
+    }
+
+
+
+    /* --------------------------------------------------------------------------------------------------------------------------- *\
+                    5-seconds timestep and schedule mark. Put here functions that we want to execute every 5 seconds.
+    \* --------------------------------------------------------------------------------------------------------------------------- */
+    if ((CurrentTimer - LastTimer5Sec) > 5000000ll)
+    {
+      LastTimer5Sec = CurrentTimer;
 
 
       /* --------------------------------------------------------------------------------------------------------------------------- *\
@@ -2230,8 +2237,8 @@ int main(void)
         if (ntp_init(FlashConfig1.SSID, FlashConfig1.Password) == false)
         {
           uart_send(__LINE__, __func__, "=========================================================\r");
-          uart_send(__LINE__, __func__, "ntp_init() failed to establish a Wi-Fi connection\r");
-          NTPData.FlagNTPInit   = FLAG_OFF;  // request a new ntp_init();
+          uart_send(__LINE__, __func__, "    ntp_init(): Failed to establish a Wi-Fi connection\r");
+          NTPData.FlagNTPInit = FLAG_OFF;  // request a new ntp_init();
           display_ntp_info();
         }
       }
@@ -2239,6 +2246,9 @@ int main(void)
       {
         if (DebugBitMask & DEBUG_NTP) uart_send(__LINE__, __func__, "Requesting RGB Matrix synchronization through NTP.\r\r");
 
+        /* Initialize with invalid value on entry. */
+        NTPData.FlagNTPSuccess = 0xFF;
+        
         /* Retrieve UTC time from Network Time Protocol server. */
         ntp_get_time();
 
@@ -2286,7 +2296,7 @@ int main(void)
 
             if (HumanTime.Second < 59)
             {
-              /* Set time in the real-time clock IC while accounting for network (Internet) latency. */
+              /* Set time in the real-time clock IC while accounting for Internet latency. */
               sleep_ms(1000 - (NTPData.NTPLatency / 1000));
               ++HumanTime.Second;
             }
@@ -2300,7 +2310,7 @@ int main(void)
         }
 
 
-        /* If current NTP update request failed, add a few seconds to update delay and retry. */
+        /* If current NTP update request failed. */
         if (Loop1UInt8 >= MAX_NTP_CHECKS)
         {
           NTPData.FlagNTPResync  = FLAG_OFF;  // NTP resync error... postpone re-sync.
@@ -3358,6 +3368,13 @@ void core1_main(void)
     sleep_ms(1000);  // slow down startup sequence if required for debugging purposes.
   }
   gpio_set_irq_enabled(BUTTON_DOWN_GPIO, GPIO_IRQ_EDGE_RISE | GPIO_IRQ_EDGE_FALL, true);
+
+
+  /* --------------------------------------------------------------------------------------------------------------------------- *\
+                                          Start the 1 msec callback in charge of matrix scan.
+  \* --------------------------------------------------------------------------------------------------------------------------- */
+  /// add_repeating_timer_ms(-1, callback_1msec_timer, NULL, &Handle1MSecTimer);
+
 
 
   /* --------------------------------------------------------------------------------------------------------------------------- *\
@@ -11197,15 +11214,15 @@ void RGB_matrix_display_time(void)
     if (WinTop == WIN_DATE)
     {
       /* Update day-of-week only if WIN_DATE is the WinTop active window. */
-      PwmLevel = Pwm[PWM_ID_BRIGHTNESS].Level;  // keep track of original PWM level on entry.
-      pwm_set_level(PWM_ID_BRIGHTNESS, 2000);   // blank LED matrix before matrix update.
+      ///// PwmLevel = Pwm[PWM_ID_BRIGHTNESS].Level;  // keep track of original PWM level on entry.
+      ///// pwm_set_level(PWM_ID_BRIGHTNESS, 2000);   // blank LED matrix before matrix update.
       /// pwm_on_off(PWM_ID_BRIGHTNESS, FLAG_OFF);
 
       /// critical_section_enter_blocking(&ThreadLock);
 
       CLK_HIGH;
 
-      win_part_cls(WIN_DATE, 201, 201);
+      ///// win_part_cls(WIN_DATE, 201, 201);
       win_printf(WIN_DATE, 201, 99, FONT_5x7, "%s", DayName[CurrentTime.DayOfWeek]);
 
       CLK_LOW;
@@ -11213,7 +11230,7 @@ void RGB_matrix_display_time(void)
       /// critical_section_exit(&ThreadLock);
 
       /* Restore original PWM level when done. */
-      pwm_set_level(PWM_ID_BRIGHTNESS, PwmLevel);
+      ///// pwm_set_level(PWM_ID_BRIGHTNESS, PwmLevel);
       /// pwm_on_off(PWM_ID_BRIGHTNESS, FLAG_ON);
     }
   }
@@ -11229,15 +11246,15 @@ void RGB_matrix_display_time(void)
     if (WinMid == WIN_DATE)
     {
       /* Update date only if WIN_DATE is the WinMid active window. */
-      PwmLevel = Pwm[PWM_ID_BRIGHTNESS].Level;  // keep track of original PWM level on entry.
-      pwm_set_level(PWM_ID_BRIGHTNESS, 2000);   // blank LED matrix before matrix update.
+      ///// PwmLevel = Pwm[PWM_ID_BRIGHTNESS].Level;  // keep track of original PWM level on entry.
+      ///// pwm_set_level(PWM_ID_BRIGHTNESS, 2000);   // blank LED matrix before matrix update.
       /// pwm_on_off(PWM_ID_BRIGHTNESS, FLAG_OFF);
 
       /// critical_section_enter_blocking(&ThreadLock);
 
       CLK_HIGH;
 
-      win_part_cls(WIN_DATE, 202, 202);
+      ///// win_part_cls(WIN_DATE, 202, 202);
 
       /* If golden age mode is On, alternate between date and period of the day. */
       if ((FlashConfig1.FlagGoldenAge) && ((CurrentTime.Second % 10) < 5))
@@ -11266,7 +11283,7 @@ void RGB_matrix_display_time(void)
       /// critical_section_exit(&ThreadLock);
 
       /* Restore original PWM level when done. */
-      pwm_set_level(PWM_ID_BRIGHTNESS, PwmLevel);
+      ///// pwm_set_level(PWM_ID_BRIGHTNESS, PwmLevel);
       /// pwm_on_off(PWM_ID_BRIGHTNESS, FLAG_ON);
     }
   }
@@ -11327,8 +11344,8 @@ void RGB_matrix_display_time(void)
     if (WinBot == WIN_TIME)
     {
       /* Update time only if WIN_TIME is the WinBot active window. */
-      PwmLevel = Pwm[PWM_ID_BRIGHTNESS].Level;  // keep track of original PWM level on entry.
-      pwm_set_level(PWM_ID_BRIGHTNESS, 2000);   // blank LED matrix before matrix update.
+      ///// PwmLevel = Pwm[PWM_ID_BRIGHTNESS].Level;  // keep track of original PWM level on entry.
+      ///// pwm_set_level(PWM_ID_BRIGHTNESS, 2000);   // blank LED matrix before matrix update.
       /// pwm_on_off(PWM_ID_BRIGHTNESS, FLAG_OFF);
 
       /// critical_section_enter_blocking(&ThreadLock);
@@ -11393,7 +11410,7 @@ void RGB_matrix_display_time(void)
       /// critical_section_exit(&ThreadLock);
 
       /* Restore original PWM level when done. */
-      pwm_set_level(PWM_ID_BRIGHTNESS, PwmLevel);
+      ///// pwm_set_level(PWM_ID_BRIGHTNESS, PwmLevel);
       /// pwm_on_off(PWM_ID_BRIGHTNESS, FLAG_ON);
     }
   }
@@ -12021,6 +12038,7 @@ void RGB_matrix_update(UINT64 *FrameBuffer)
 
   /* Latch this value. */
   STB_HIGH;
+  NOP;
   STB_LOW;
 
 
@@ -18367,7 +18385,7 @@ void win_init()
   Window[WIN_TIME].StartColumn  = 0;
   Window[WIN_TIME].EndRow       = 31;
   Window[WIN_TIME].EndColumn    = 63;
-  Window[WIN_TIME].BorderColor  = RED;
+  Window[WIN_TIME].BorderColor  = BLUE;
   Window[WIN_TIME].InsideColor  = GREEN;
   Window[WIN_TIME].WinStatus    = WINDOW_INACTIVE;
 

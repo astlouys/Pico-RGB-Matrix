@@ -19,7 +19,7 @@
    18-FEB-2024 2.00 - Adapted for Pico-RGB-Matrix.
 \* ============================================================================================================================================================= */
 
-#define RELEASE_VERSION
+/// #define RELEASE_VERSION
 #ifdef RELEASE_VERSION
 #warning ===============> NTP client built as RELEASE_VERSION.
 #else   // RELEASE_VERSION
@@ -92,40 +92,36 @@ void display_ntp_info(void)
 
   uart_send(__LINE__, __func__, "=========================================================\r");
 
-  if (&NTPData != NULL)
-  {
-    uart_send(__LINE__, __func__, " NTPData:\r");
-    uart_send(__LINE__, __func__, " --------\r");
-    uart_send(__LINE__, __func__, "FlagNTPInit:                   0x%2.2X\r", NTPData.FlagNTPInit);
-    uart_send(__LINE__, __func__, "FlagNTPResync:                 0x%2.2X\r", NTPData.FlagNTPResync);
-    uart_send(__LINE__, __func__, "FlagNTPSuccess:                0x%2.2X\r", NTPData.FlagNTPSuccess);
-    uart_send(__LINE__, __func__, "FlagNTPHistory:                0x%2.2X\r", NTPData.FlagNTPHistory);
-    uart_send(__LINE__, __func__, "NTPErrors:             %12lu\r",           NTPData.NTPErrors);
-    uart_send(__LINE__, __func__, "NTPPollCycles:         %12lu\r",           NTPData.NTPPollCycles);
-    uart_send(__LINE__, __func__, "NTPReadCycles:         %12lu\r",           NTPData.NTPReadCycles);
-    uart_send(__LINE__, __func__, "NTPLatency (usec):     %12lld\r",          NTPData.NTPLatency);
-    uart_send(__LINE__, __func__, "NTPUpdateTime:         %12.12llu\r",       NTPData.NTPUpdateTime);
-    uart_send(__LINE__, __func__, "NTPLag:                %12.12llu\r",       NTPData.NTPLag);
-    uart_send(__LINE__, __func__, "UnixTime:              %12.12llu\r\r",     NTPData.UnixTime);
-  }
-  sleep_ms(50);  // prevent communication override.
+  uart_send(__LINE__, __func__, " NTPData:\r");
+  uart_send(__LINE__, __func__, " --------\r");
+  uart_send(__LINE__, __func__, "FlagNTPInit:                   0x%2.2X\r", NTPData.FlagNTPInit);
+  uart_send(__LINE__, __func__, "FlagNTPResync:                 0x%2.2X\r", NTPData.FlagNTPResync);
+  uart_send(__LINE__, __func__, "FlagNTPSuccess:                0x%2.2X\r", NTPData.FlagNTPSuccess);
+  uart_send(__LINE__, __func__, "FlagNTPHistory:                0x%2.2X\r", NTPData.FlagNTPHistory);
+  sleep_ms(80);  // prevent communication override.
+  uart_send(__LINE__, __func__, "NTPErrors:             %12lu\r",           NTPData.NTPErrors);
+  uart_send(__LINE__, __func__, "NTPPollCycles:         %12lu\r",           NTPData.NTPPollCycles);
+  uart_send(__LINE__, __func__, "NTPReadCycles:         %12lu\r",           NTPData.NTPReadCycles);
+  uart_send(__LINE__, __func__, "NTPLatency (usec):     %12lld\r",          NTPData.NTPLatency);
+  uart_send(__LINE__, __func__, "NTPUpdateTime:         %12.12llu\r",       NTPData.NTPUpdateTime);
+  uart_send(__LINE__, __func__, "NTPLag:                %12.12llu\r",       NTPData.NTPLag);
+  uart_send(__LINE__, __func__, "UnixTime:              %12.12llu\r\r",     NTPData.UnixTime);
+  sleep_ms(80);  // prevent communication override.
 
 
-  if (&NTPStruct != NULL)
-  {
-    uart_send(__LINE__, __func__, " NTPStruct:\r");
-    uart_send(__LINE__, __func__, " ----------\r");
-    uart_send(__LINE__, __func__, "NTPServerAddress:   %15s\r",               ip4addr_ntoa(&NTPStruct.NTPServerAddress));
-    uart_send(__LINE__, __func__, "DNSRequestSent:                0x%2.2X\r", NTPStruct.DNSRequestSent);
-    uart_send(__LINE__, __func__, "NTPResendAlarm:              %6u\r",       NTPStruct.NTPResendAlarm);
-    uart_send(__LINE__, __func__, "\r");
-  }
-
+  uart_send(__LINE__, __func__, " NTPStruct:\r");
+  uart_send(__LINE__, __func__, " ----------\r");
+  uart_send(__LINE__, __func__, "NTPServerAddress:   %15s\r",               ip4addr_ntoa(&NTPStruct.NTPServerAddress));
+  uart_send(__LINE__, __func__, "DNSRequestSent:                0x%2.2X\r", NTPStruct.DNSRequestSent);
+  uart_send(__LINE__, __func__, "NTPResendAlarm:              %6u\r",       NTPStruct.NTPResendAlarm);
+  uart_send(__LINE__, __func__, "\r");
+  sleep_ms(80);  // prevent communication override.
 
 
   uart_send(__LINE__, __func__, " Miscellaneous:\r");
   uart_send(__LINE__, __func__, " --------------\r");
   uart_send(__LINE__, __func__, "AbsoluteTime:          %12llu\r\r", time_us_64() / 1000000ll);
+  sleep_ms(80);  // prevent communication override.
 
 
   TimeValue = (absolute_time_diff_us(AbsoluteTime, NTPData.NTPUpdateTime) / 1000000ll);
@@ -135,6 +131,7 @@ void display_ntp_info(void)
   else
     uart_send(__LINE__, __func__, "Time remaining (sec):  %12lld\r", TimeValue);
   uart_send(__LINE__, __func__, "NTPRefresh:            %12u\r\r",   NTPData.NTPRefresh);
+  sleep_ms(80);  // prevent communication override.
 
 
   TimeValue = (absolute_time_diff_us(AbsoluteTime, NTPData.NTPLag) / 1000000ll);
@@ -145,7 +142,7 @@ void display_ntp_info(void)
     uart_send(__LINE__, __func__, "Time remaining (sec):  %12lld\r", TimeValue);
   uart_send(__LINE__, __func__, "NTPLagTime:            %12lu\r",    NTPData.NTPLagTime);
   uart_send(__LINE__, __func__, "=========================================================\r\r");
-  sleep_ms(50);  // prevent communication override.
+  sleep_ms(80);  // prevent communication override.
 
   return;
 }
@@ -200,15 +197,16 @@ static void ntp_dns_found(const char *hostname, const ip_addr_t *ipaddr, void *a
   UINT8 FlagLocalDebug = FLAG_OFF;  // may be modify for debug purposes.
 #endif  // RELEASE_VERSION
 
+  /// UCHAR IpAddress[INET_ADDRSTRLEN];
 
-  if (FlagLocalDebug)
-    uart_send(__LINE__, __func__, "Entering ntp_dns_found()\r");
 
+  if (FlagLocalDebug) uart_send(__LINE__, __func__, "Entering ntp_dns_found()\r");
 
   if (ipaddr)
   {
     NTPStruct.NTPServerAddress = *ipaddr;
-    if (FlagLocalDebug) uart_send(__LINE__, __func__, "NTP server address: %s\r", ip4addr_ntoa(ipaddr));
+    if (FlagLocalDebug) uart_send(__LINE__, __func__, "NTP server address:    %15s\r", ip4addr_ntoa(ipaddr));
+    if (FlagLocalDebug) uart_send(__LINE__, __func__, "Printing IP address from pointer: %lX\r", ipaddr);
     ntp_request();
   }
   else
@@ -289,20 +287,14 @@ void ntp_get_time(void)
     if (FlagLocalDebug)
     {
       uart_send(__LINE__, __func__, "=========================================================\r");
-      uart_send(__LINE__, __func__, "                   Poll cycle on entry\r");
-      display_ntp_info();
+      uart_send(__LINE__, __func__, "                       Poll cycle\r");
+      uart_send(__LINE__, __func__, "=========================================================\r");
+      /// display_ntp_info();
     }
 
     NTPData.FlagNTPSuccess = FLAG_POLL;
     NTPData.NTPPollCycles++;
     NTPData.NTPUpdateTime = make_timeout_time_ms(NTPData.NTPRefresh * 1000);
-
-    if (FlagLocalDebug)
-    {
-      uart_send(__LINE__, __func__, "=========================================================\r");
-      uart_send(__LINE__, __func__, "                   Poll cycle on exit\r");
-      display_ntp_info();
-    }
 
     return;
   }
@@ -311,30 +303,21 @@ void ntp_get_time(void)
   if (FlagLocalDebug)
   {
     uart_send(__LINE__, __func__, "=========================================================\r");
-    uart_send(__LINE__, __func__, "                   Read cycle on entry\r");
-    display_ntp_info();
+    uart_send(__LINE__, __func__, "                      Read cycle\r");
+    uart_send(__LINE__, __func__, "=========================================================\r");
+    /// display_ntp_info();
   }
 
   NTPData.NTPUpdateTime = make_timeout_time_ms(NTPData.NTPRefresh * 1000);
   NTPData.NTPLag        = make_timeout_time_ms(NTPData.NTPLagTime * 1000);
-
-  if (FlagLocalDebug)
-  {
-    uart_send(__LINE__, __func__, "=========================================================\r");
-    uart_send(__LINE__, __func__, "                   Read cycle on exit\r");
-    display_ntp_info();
-  }
-
-
-
   NTPData.NTPReadCycles++;
 
   /* Set alarm in case udp requests are lost (10 seconds). */
   NTPStruct.NTPResendAlarm = add_alarm_in_ms(NTP_RESEND_TIME, ntp_failed_handler, &NTPStruct, true);
 
-  /* NOTE: cyw43_arch_lwip_begin/end should be used around calls into lwIP to ensure correct locking. You can omit them if you are
-            in a callback from lwIP. Note that when using pico_cyw_arch_poll these calls are a no-op and can be omitted, but it is
-            a good practice to use them in case you switch the cyw43_arch type later. */
+  /* NOTE: cyw43_arch_lwip_begin() / cyw43_arch_lwip_end() should be used around calls into LwIP to ensure correct locking.
+           You can omit them if you are in a callback from LwIP. Note that when using pico_cyw_arch_poll library these calls
+           are a no-op and can be omitted, but it is a good practice to use them in case you switch the cyw43_arch type later. */
   cyw43_arch_lwip_begin();
   {
     ReturnCode = dns_gethostbyname(NTP_SERVER, &NTPStruct.NTPServerAddress, ntp_dns_found, &NTPStruct);
@@ -401,10 +384,10 @@ int ntp_init(UCHAR *SSID, UCHAR *Password)
     uart_send(__LINE__, __func__, "Trying to establish Wi-Fi connection with these credentials:\r");
     uart_send(__LINE__, __func__, "SSID:     [%s]\r", SSID);
     uart_send(__LINE__, __func__, "Password: [%s]\r", Password);
-    uart_send(__LINE__, __func__, "Data below is displayed by CYW43:\r");
+    /// uart_send(__LINE__, __func__, "Data below is displayed by CYW43:\r");
   }
   printf("===================================================================================================================\r");
-  cyw43_arch_enable_sta_mode();
+  cyw43_arch_enable_sta_mode();  // initialize Wi-Fi as a client.
   printf("===================================================================================================================\r\r\r");
   sleep_ms(250);
 
@@ -454,15 +437,11 @@ int ntp_init(UCHAR *SSID, UCHAR *Password)
       NTPData.NTPUpdateTime = make_timeout_time_ms(NTPData.NTPLagTime * 1000);
       return false;
     }
-    else
-    {
-      uart_send(__LINE__, __func__, "Wi-Fi connection successsful after %u retries\r", RetryCount);
-    }
   }
 
 
   /* Wi-Fi connection successful. */
-  if (FlagLocalDebug) uart_send(__LINE__, __func__, "Wi-Fi connection succeeded (after %u retries).\r", RetryCount);
+  uart_send(__LINE__, __func__, "Wi-Fi connection succeeded (after %u retries).\r", RetryCount);
 
 
   /* Fast blink Pico's LED 5 times to indicate Wi-Fi successful connection. */
@@ -529,7 +508,7 @@ static void ntp_recv(void *arg, struct udp_pcb *pcb, struct pbuf *p, const ip_ad
 
 
   /* Check the result. */
-  if (ip_addr_cmp(addr, &NTPStruct.NTPServerAddress) && port == NTP_PORT && p->tot_len == NTP_MSG_LEN && mode == 0x4 && stratum != 0)
+  if (ip_addr_cmp(addr, &NTPStruct.NTPServerAddress) && (port == NTP_PORT) && (p->tot_len == NTP_MSG_LEN) && (mode == 0x4) && (stratum != 0))
   {
     pbuf_copy_partial(p, SecondBuffer, sizeof(SecondBuffer), 40);
     NTPData.NTPLatency = (absolute_time_diff_us(NTPData.NTPSend, NTPData.NTPReceive) / 2);
@@ -582,9 +561,9 @@ static void ntp_request(void)
   if (FlagLocalDebug) uart_send(__LINE__, __func__, "Entering ntp_request()\r");
 
 
-  // cyw43_arch_lwip_begin() / cyw43_arch_lwip_end() should be used around calls into lwIP to ensure correct locking.
-  // You can omit them if you are in a callback from lwIP. Note that when using pico_cyw_arch_poll, these calls are
-  // a no-op and can be omitted, but it is a good practice to use them in case you switch the cyw43_arch type later.
+  /* NOTE: cyw43_arch_lwip_begin() / cyw43_arch_lwip_end() should be used around calls into LwIP to ensure correct locking.
+           You can omit them if you are in a callback from LwIP. Note that when using pico_cyw_arch_poll library these calls
+           are a no-op and can be omitted, but it is a good practice to use them in case you switch the cyw43_arch type later. */
   cyw43_arch_lwip_begin();
   {
     struct pbuf *p = pbuf_alloc(PBUF_TRANSPORT, NTP_MSG_LEN, PBUF_RAM);
@@ -621,11 +600,16 @@ static void ntp_result(int status, time_t *UnixTime)
 
   if (FlagLocalDebug) uart_send(__LINE__, __func__, "Entering ntp_result()\r");
 
-  if (status == 0 && UnixTime)
+  if ((status == 0) && UnixTime)
   {
     if (FlagLocalDebug) uart_send(__LINE__, __func__, "UnixTime:                 %12llu\r", *UnixTime);
     NTPData.UnixTime       = *UnixTime;
     NTPData.FlagNTPSuccess = FLAG_ON;
+  }
+  else
+  {
+    NTPData.FlagNTPSuccess = FLAG_OFF;
+    NTPData.FlagNTPHistory = FLAG_OFF;
   }
 
   if (NTPStruct.NTPResendAlarm > 0)
