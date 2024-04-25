@@ -1,7 +1,11 @@
 ![image](https://github.com/astlouys/Pico-RGB-Matrix/assets/102733655/7ccc4ed1-cc92-4a48-820c-ed7c5804f344)
 
-# I need your feedback... see "Discussions" section in this repository
 # Firmware for the Waveshare's Pico-RGB-Matrix device
+What's new with Version 2.01:
+Not much, but I'm releasing this version since my original Firmware (Version 2.00) didn't work at all on the new hardware versions of the Pico-RGB-Matrix.
+- Fix a timing problem with the new versions of the control board and matrix LED board. Many thanks to Waveshare support team and engineering team for their help with this one!!
+- Improve bitmap of digits "6" and "9" of the 8x10 character set.
+- Optimize NTP algorithm.
 
 NOTES:
 
@@ -18,12 +22,12 @@ c) The flle "pico_sdk_import.cmake" is not in the repository but is required to 
 1)	Add support for NTP (“Network Time Protocol”) to periodically resynchronize the RGB Matrix with an Internet time reference source if user installed a PicoW.
 2)	Handling of the RGB Matrix framebuffer ported from 8-bits to 64-bits for easier, faster and optimized support.
 3)	Add horizontal scrolling feature for text on the LED display.
-4)	Provide customizable “auto-scroll” option to scroll information on RGB Matrix at adjustable time intervals. Information to be scrolled can be selected by user among a predefined choice (see details the User Guide). Five (5) independent auto-scrolls are available.
+4)	Provide customizable “auto-scroll” option to scroll information on RGB Matrix at adjustable time intervals. Information to be scrolled can be selected by user among predefined choices. Five (5) independent auto-scrolls are available.
 5)	Rename many variables and function names so that they are more representative.
 6)	Keep only the Raspberry Pi Pico (or PicoW) source code (discard EPS32 microcontroller support).
-7)	Discard Chinese language support.
+7)	Discard Chinese language support (sorry, I don't know Chinese language).
 8)	Add a 5x7 character set bitmap with variable width.
-9)	Add a 8x10 character set bitmap. Many thanks to Pasquale D’Antini (“oldmaker” on GitHub) for his collaboration on this.
+9)	Add a 8x10 character set bitmap. Many thanks to Pasquale D’Antini (“oldmaker” on GitHub) for his collaboration on this one.
 10)	Provide 9 different and independent alarms.
 11)	Alarms can be configured for different (selectable) days-of-week, different number of “rings” at different intervals, different message scrolling on LED matrix when the alarm is ringing.
 12)	RGB Matrix provides indicators to show what alarms are On and what alarms are Off.
@@ -35,11 +39,11 @@ c) The flle "pico_sdk_import.cmake" is not in the repository but is required to 
 18)	Add a hysteresis to the automatic brightness control to prevent quick changes in the LED brightness because of a quick interference with the ambient light.
 19)	Add support for the remote control unit provided with the Pico-RGB-Matrix.
 20)	Pico's core 1 is now used to relief core 0 of some tasks.
-21)	Add an elementary windowing system with “exploding windows” animation..
-22)	Add a debugging engine and algorithm to easily turn On debugging for specific sections of code through an external terminal emulator program.
-23)	Add many “RGB_matrix_xxx()” family of hi-level functions with an easier interface.
-24)	Add “win_xxx()” family of hi-level windowing functions with an easier interface.
-25)	Add a complete interface with an optional external terminal emulator. This allows to go deeper and in more details for some device options / features.
+21)	Add an elementary windowing system with “exploding windows” animation.
+22)	Add a debugging engine and algorithm to easily turn On debugging for specific sections of code through an external terminal emulator program or inside source code.
+23)	Add many “RGB_matrix_xxx()” family of hi-level functions with an easy to use interface.
+24)	Add “win_xxx()” family of hi-level windowing functions with an easy to use interface.
+25)	Add a complete interface with an optional external terminal emulator. This allows to go deeper and in more details for some device options / features / configuration.
 26)	Add auto-detection of CDC USB terminal to jump automatically into a terminal menu.
 27)	Change the layout of the clock display.
 28)	Currently support English and French languages.
@@ -51,7 +55,7 @@ c) The flle "pico_sdk_import.cmake" is not in the repository but is required to 
 34)	RGB Matrix can be configured to become a “night light” when the ambient light is dark.
 35)	Provide ambient temperature display.
 36)	Temperature unit adjustable in Celsius or Fahrenheit.
-37)	Add a mechanism to allow for device customization for different usages / users / rooms.
+37)	Add a mechanism in source code to allow for device customization for different uses / users / rooms.
 38)	Allow the device to be set in “bootsel” mode by firmware to compensate for a problem due to a physical difference between Pico and PicoW (see section about uploading a new Firmware version in User Guide).
 39)	Add a delay during the power-up sequence so that developers can put the Pico in “bootsel mode” while the LED matrix is blank (to prevent LED over-bright).
 40)	Add a delay during the power-up sequence so that users have time to start a terminal emulator software to interact with the Pico-RGB-Matrix.
@@ -64,9 +68,9 @@ c) The flle "pico_sdk_import.cmake" is not in the repository but is required to 
 47)	Implement a watchdog mechanism to recover from a Firmware crash for users who want to modify / work on the Firmware.
 48)	Add an indicator on the RGB Matrix showing the watchdog timing status and "how far we are" from an eventual restart.
 49)	LED display provides indicators to show that the main system "forever loop" is up and running (still active).
-50)	Functions have been implemented to support “human time”, “tm time” and "Unix time”, to better support DS3231, Network Time Protocol and other inherent functions.
+50)	Functions have been implemented to support “human time”, “tm time” and "Unix time”, to better support DS3231, Network Time Protocol and other inherent functions (for developers).
 51)	Optionally scroll the cumulative device “Up time” since last power-up.
-52)	Provide a specific indicator on the RGB Matrix to let the user know if there is a problem with Wi-Fi and / or NTP support.
+52)	Provide a specific indicator on the RGB Matrix to let the user know if there is a problem with the Wi-Fi connection and / or NTP support.
 53)	Provide a “Golden Age” option to help senior people having problems in their day-to-day lives.
 54)	Allows for automatic detection of microcontroller used (Pico or PicoW), along with microcontroller “Unique ID” (“serial number”).
 55)	Add a count-down timer with an alarm (to be completed).
@@ -76,4 +80,4 @@ c) The flle "pico_sdk_import.cmake" is not in the repository but is required to 
 
 This project provides Firmware for the "Pico-RGB-Matrix" product from Waveshare (The clock is available directly from Waveshare website, or from Amazon). It is based on a Raspberry Pi Pico microcontroller.
 
-Waveshare provides a basic Firmware (Version 1.00) for the Pico-RGB-Matrix. Current project provides many enhancements and functionalities to the device. You may refer to the User Guide of the most recent Firmware Version (included in this repository) to see the detailed list of changes / enhancements.
+Waveshare provides a basic Firmware ("Version 1.00") for the Pico-RGB-Matrix. Current project provides many enhancements and functionalities to the device. You may refer to the User Guide of the most recent Firmware Version (included in this repository) to see the detailed list of changes / enhancements.
